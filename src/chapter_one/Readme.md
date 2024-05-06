@@ -360,8 +360,59 @@ class Customer {
 statement를 복사한 메서드 안에서도 재사용 할 수 있다. 이렇게 하면 메서드 안의 계산식을 바꿔야 할 때도 한군데만 수정하면 된다.  
 
 그러나 사용자들의 요구가 생겼다!! 대여점의 비디오 분류를 바꾸려고 준비 중이다.
-조건문 코드를 수정해서 비디오 분류를 변경해야 한다.
+조건문 코드를 수정해서 비디오 분류를 변경해야 한다. 분류를 어떻게 변경할지는 결정되지 않았고, 시존과 다른 방식으로 분류하리란 것만 알 수 있다.
+수정하는 각 비디오 분류마다 대여료와 적립 포인트으이 적립 비율도 결정해야 한다. 현재 단계에서 수정하기엔 무리이기에
+우선 대여료 메서드와 적립 포인트 메서드 부터 마무리 짓고 조건문 코드를 수정하여 비디오 분류를 변경해야 한다.
 ## 가격 책정 부분의 조건문의 재정의로 교체
+제일 먼저 고칠 부분은 switch 부분이다.
+타 객체의 속성을 switch문으로 처리하는 것은 나쁜 방법이다. 자신의 데이터를 사용해야 한다.
+기존 Rental 클래스의 getCharge() 메서드를 Movie 클래스로 옮긴다.
+```java
+class Rental {
+    double getCharge(){
+        double result = 0;
+        switch (getMovie().getPriceCode()) {
+            case Movie.REGULAR:
+                result += 2;
+                if (getDaysRented() > 2)
+                    result += (getDaysRented() - 2) * 1.5;
+                break;
+            case Movie.NEW_RELEASE:
+                result += getDaysRented() * 3;
+                break;
+            case Movie.CHILDRENS:
+                result += 1.5;
+                if (getDaysRented() > 3)
+                    result += (getDaysRented() - 3) * 1.5;
+                break;
+    }
+    return result;
+}
+
+//Movie 클래스로 옮기기
+class Movie {
+    double getCharge(int daysRented) {
+        double result = 0;
+        switch (getPriceCode()) {
+            case Movie.REGULAR:
+                result += 2;
+                if (daysRented > 2)
+                    result += (daysRented - 2) * 1.5;
+                break;
+            case Movie.NEW_RELEASE:
+                result += daysRented * 3;
+                break;
+            case Movie.CHILDRENS:
+                result += 1.5;
+                if (daysRented > 3)
+                    result += (daysRented - 3) * 1.5;
+                break;
+        }
+        return result;
+    }
+}
+```
+getCharege() 메서드의 매개변수로 daysRented를 받아서 사용하도록 변경하였다.
 ## 고찰
 
 ### 내 고찰
