@@ -369,7 +369,7 @@ statement를 복사한 메서드 안에서도 재사용 할 수 있다. 이렇�
 기존 Rental 클래스의 getCharge() 메서드를 Movie 클래스로 옮긴다.
 ```java
 class Rental {
-    double getCharge(){
+    double getCharge() {
         double result = 0;
         switch (getMovie().getPriceCode()) {
             case Movie.REGULAR:
@@ -385,8 +385,9 @@ class Rental {
                 if (getDaysRented() > 3)
                     result += (getDaysRented() - 3) * 1.5;
                 break;
+        }
+        return result;
     }
-    return result;
 }
 
 //Movie 클래스로 옮기기
@@ -413,6 +414,40 @@ class Movie {
 }
 ```
 getCharege() 메서드의 매개변수로 daysRented를 받아서 사용하도록 변경하였다.
+getCharge메서드는 대여 기간과 비디오 종류를 사용한다.
+대여기간을 Rental 클래스에 전달하지 않고 Movie클래스에 전달한 이유는 사용자가 요청한 변경은 단지 새로운 비디오 종류를 추가해 달라는 것이었기 때문이다.
+비디오 종류에 대한 정보는 나중에 변경할 가능성이 높기에 그로인한 영향을 최소화 하고자 대여료 계산을 Movie 클래스 안에 넣은 것이다.
+
+```java
+class Rental {
+    double getCharge() {
+        return _movie.getCharge(_daysRented);
+    }
+    
+    /*
+    int getFrequentRenterPoints() {
+        if ((getMovie().getPriceCode() == Movie.NEW_RELEASE) && getDaysRented() > 1)
+            return 2;
+        else
+            return 1;
+    }
+    */
+    int getFrequentRenterPoints() {
+        return _movie.getFrequentRenterPoints(_daysRented);
+    }
+}
+class Movie {
+    int getFrequentRenterPoints(int daysRented) {
+        if ((getPriceCode() == Movie.NEW_RELEASE) && daysRented > 1)
+            return 2;
+        else
+            return 1;
+    }
+}
+```
+적립 포인트 계산 메서드도 Movie클래스로 옮겨주었다. 이렇게 하면 비디오 종류마다 달라지는 대여료와 적립포인트 계산이 비디오 분류가 든 클래스 자체에서 처리된다.
+
+**마지막 단계, 상속 구조 만들기**
 ## 고찰
 
 ### 내 고찰
